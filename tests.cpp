@@ -2,26 +2,82 @@
 
 #include "functions.cpp"
 
-TEST(GenerateNumbers, CheckLength) { // Test expected to pass
-    int digits = 1 + rand() % 100; // Generates number from 1-100
-    std::string number = generate_number(digits);
-    int length = (number[0] == '-' ? number.length() - 1 : number.length());
-
-    EXPECT_EQ(length, digits);
+/* Test expected to throw exception */
+TEST(GenerateNumber, CheckArguments) {
+    srand(time(0));
+    for (int i = 0; i < 10; i++) {
+        int digits = -50 + rand() % 101;
+        try {
+            generate_number(digits);
+            if (digits <= 0) {
+                FAIL() << "Expected invalid_argument exception.";
+            }
+        } catch(invalid_argument const & e) {
+            EXPECT_EQ(e.what(),std::string("Argument must be greater then 0."));
+        } catch(...) {
+            FAIL() << "Expected invalid_argument exception.";
+        }
+    }
 }
 
-TEST(Number, getMaxLength) {
-    EXPECT_EQ(get_max_length("-120", "1"), 4);
-    EXPECT_EQ(get_max_length("-223", "-950"), 4);
-    EXPECT_EQ(get_max_length("0", "690"), 3);
-    EXPECT_EQ(get_max_length("-2", "864921657"), 9);
+/* Test expected to pass */
+TEST(GenerateNumber, CheckLength) {
+    for (int i = 0; i < 10; i++) {
+        int digits = 1 + rand() % 100; // Generates number from 1-100
+        std::string number = generate_number(digits);
+        int length = (number[0] == '-' ? number.length() - 1 : number.length());
+
+        EXPECT_EQ(length, digits);
+    }
 }
 
-TEST(AdjustNumber, CheckNumber) { // Test expected to pass
-    EXPECT_EQ(adjust_number("1", 1), "1");
-    EXPECT_EQ(adjust_number("-1", 3), "-01");
-    EXPECT_EQ(adjust_number("99", 5), "00099");
-    EXPECT_EQ(adjust_number("-3", 2), "-3");
+/* Test expected to pass */
+TEST(GenerateNumber, CheckCorrectCharacters) {
+    for (int i = 0; i < 10; i++) {
+        int digits = 1 + rand() % 100; // Generates number from 1-100
+        std::string number = generate_number(digits);
+
+        for (int y = 0; y < number.length(); y++) {
+            if (number[y] != '-' && !(number[y] >= '0' && number[y] <= '9')) {
+                FAIL() << "Unexpected characters in output.";
+            }
+        }
+    }
+}
+
+/* Test expected to pass */
+TEST(AdjustNumber, CheckAdjustedNumber) {
+    for (int i = 0; i < 10; i++) {
+        int digits = -9999 + rand() % 20000; // Generates number from -9999 to 9999
+        std::string number = std::to_string(digits);
+
+        int adjust_length = number.length() + rand() % 5;
+        std::string adjusted_number = adjust_number(number, adjust_length);
+
+        EXPECT_EQ(adjust_length, adjusted_number.length());
+
+        int number_of_zeros = 0;
+        number_of_zeros += adjust_length - number.length();
+        if (number[0] == '-') {
+            EXPECT_EQ(std::string(number_of_zeros, '0'), adjusted_number.substr(1, number_of_zeros));
+        } else {
+            EXPECT_EQ(std::string(number_of_zeros, '0'), adjusted_number.substr(0, number_of_zeros));
+        }
+    }
+
+    for (int i = 0; i < 5; i++) {
+        int digits = -9999 + rand() % 20000; // Generates number from -9999 to 9999
+        std::string number = std::to_string(digits);
+
+        try {
+            adjust_number(number, number.length() - (1 + rand() % 5));
+            FAIL() << "Length must be greater or equal to @number length.";
+        } catch(invalid_argument const & e) {
+            EXPECT_EQ(e.what(),std::string("Length must be greater or equal to @number length."));
+        } catch(...) {
+            FAIL() << "Length must be greater or equal to @number length.";
+        }
+    }
 }
 
 TEST(AddNumbers, AddingPositives) {

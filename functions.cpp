@@ -1,32 +1,39 @@
 #include <iostream>
 #include <string>
+#include <stdexcept>
 
-/*
-Generates a random positive or negative number, given
-1 parameter of how many digits will the number have
-*/
-std::string generate_number(int digits) {
-    /* Initial Declaration */
-    std::string number = "";
+using namespace std;
 
-    /* Number Generation */
-    number += std::to_string(1 + rand() % 9); // Ensure that the first digit is from 1-9
-    for (int i = 0; i < digits - 1; i++) { // Since first digit is already generated we must do digits - 1
-        number += std::to_string(rand() % 10); // Other digits can be from 0-9
+
+// Function generates a random positive or negative number
+//     @digits: number of digits to generate, should be >=1
+string generate_number(int digits) {
+
+    if (digits < 1) {
+        throw invalid_argument("Argument must be greater then 0.");
     }
 
-    /* Return result number, but add if the number is possitive or negative using ternary operator */
+    string number = "";
+
+    // Number Generation
+    number += to_string(1 + rand() % 9); // Ensure that the first digit is from 1-9
+    for (int i = 0; i < digits - 1; i++) { // Since first digit is already generated we must do digits - 1
+        number += to_string(rand() % 10); // Other digits can be from 0-9
+    }
+
+    // Return result number, but add if the number is possitive or negative using ternary operator
     return (rand() % 2 == 0 ? "-" : "") + number;
 }
 
-int get_max_length(std::string numberA, std::string numberB) {
-    //numberA = (numberA[0] == '-' ? numberA.substr(1, numberA.length()) : numberA);
-    //numberB = (numberB[0] == '-' ? numberB.substr(1, numberB.length()) : numberB);
+// Function takes a string and adjusts its length
+//     @number: string that needs to be adjusted to a specific length
+//     @length: number what the string needs to be adjusted to
+string adjust_number(string number, int length) {
 
-    return (numberA.length() < numberB.length() ? numberB.length() : numberA.length());
-}
+    if (length < number.length()) {
+        throw invalid_argument("Length must be greater or equal to @number length.");
+    }
 
-std::string adjust_number(std::string number, int length) {
     while(number.length() < length) {
         if (number[0] == '-') {
             number[0] = '0';
@@ -39,7 +46,7 @@ std::string adjust_number(std::string number, int length) {
     return number;
 }
 
-bool isGreater(std::string numberA, std::string numberB) {
+bool isGreater(string numberA, string numberB) {
     for (int i = 0; i < numberA.length(); i++) {
         if ((numberA[i] == '-' && numberB[i] == '0') || (numberB[i] == '-' && numberA[i] == '0') ) {
             continue;
@@ -56,14 +63,14 @@ bool isGreater(std::string numberA, std::string numberB) {
     return true;
 }
 
-std::string add_stringA_and_stringB(std::string numberA, std::string numberB) {
-    int max_length = get_max_length(numberA, numberB);
+string add_stringA_and_stringB(string numberA, string numberB) {
+    int max_length = max(numberA.length(), numberB.length());
 
     numberA = adjust_number(numberA, max_length);
     numberB = adjust_number(numberB, max_length);
 
     if (!isGreater(numberA, numberB)) {
-        std::swap(numberA, numberB);
+        swap(numberA, numberB);
     }
 
     bool pos = numberA[0] == numberB[0] || (numberA[0] != '-' && numberB[0] != '-');
@@ -74,13 +81,13 @@ std::string add_stringA_and_stringB(std::string numberA, std::string numberB) {
         if (pos) { // Case when both numbers are either positive or negative
             if (numberA[i-1] == '-' || numberB[i-1] == '-') {
                 if (carry != 0) {
-                    numberA[0] = std::to_string(carry).back();
+                    numberA[0] = to_string(carry).back();
                 }
                 numberA[0] = '-';
                 break;
             }
             sum = numberA[i-1] + numberB[i-1] - (2 * 48) + carry;
-            numberA[i-1] = std::to_string(sum).back();
+            numberA[i-1] = to_string(sum).back();
             carry = sum / 10;
         } else {
             if (numberA[i-1] == '-' || numberB[i-1] == '-') {
@@ -89,7 +96,7 @@ std::string add_stringA_and_stringB(std::string numberA, std::string numberB) {
             }
             carry = (numberA[i-1] < numberB[i-1] ? 1 : 0); 
             sum = numberA[i-1] - numberB[i-1] + (carry * 10);
-            numberA[i-1] = std::to_string(sum).back();
+            numberA[i-1] = to_string(sum).back();
             numberA[i-2] = (carry == 1 ? numberA[i-2] - 1 : numberA[i-2]);
         }
     }
