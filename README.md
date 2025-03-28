@@ -1,3 +1,12 @@
+--------------------------------------------------------
+                  _______        _    
+                 |__   __|      | |   
+                    | | __ _ ___| | __
+                    | |/ _` / __| |/ /
+                    | | (_| \__ \   < 
+                    |_|\__,_|___/_|\_\
+--------------------------------------------------------
+
 Create a program that can calculate 50 numbers, where the first number is 1-digit, the second number is 2-digit, … the 50th number is 50-digit.
 
 Example
@@ -19,3 +28,25 @@ What the source code should contain:
 3. Primarily use an object-oriented language (we agreed on C++)
 4. Use only standard data types. It should not contain libraries/data types that can work with large numbers
 5. Write tests that verify that the functions/methods work correctly
+
+--------------------------------------------------------
+                 ____        _ _     _ 
+                |  _ \      (_) |   | |
+                | |_) |_   _ _| | __| |
+                |  _ <| | | | | |/ _` |
+                | |_) | |_| | | | (_| |
+                |____/ \__,_|_|_|\__,_|
+--------------------------------------------------------
+
+After clone, only run for the first time:
+    $ cmake -S . -B build
+
+Build/Re-build project with:
+    $ cmake --build build -j 12
+
+
+Run tests with:
+    $ ./build/tests
+
+Run main with:
+    $ ./build/main
