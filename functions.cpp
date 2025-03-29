@@ -34,11 +34,14 @@ string adjust_number(string number, int length) {
         throw invalid_argument("Length must be greater or equal to @number length.");
     }
 
+    // Loop until string is the right length
     while(number.length() < length) {
+        // If the "number" is negative we need to keep '-' at the start and add a '0'
+        // otherwise add a '0' at the start
         if (number[0] == '-') {
             number[0] = '0';
             number = '-' + number;
-        } else {
+        } else { 
             number = '0' + number;
         }
     }
@@ -46,39 +49,61 @@ string adjust_number(string number, int length) {
     return number;
 }
 
+// Function takes 2 strings and determines if the first parameter is greater
+// returns true if the first parameter is greater
+//     @numberA: string thats expected to be greater
+//     @numberB: string thats expected to be lower
 bool isGreater(string numberA, string numberB) {
+
     for (int i = 0; i < numberA.length(); i++) {
-        if ((numberA[i] == '-' && numberB[i] == '0') || (numberB[i] == '-' && numberA[i] == '0') ) {
+        // 1. If the numbers are equal we move on to the next index
+        // 2. If one of the numbers is negative and the other starts with a '0', move on to the next index
+        // 3. If the first number is negative and the second one is greater then '0' we know that second 
+        //    number is greater, return false
+        // 4. Same as the 2., but we know that first number is greater, return true
+        // 5. We know that either of the numbers starts with '-', so we compare them
+        // 6. otherwise it means numberA is greater
+        if (numberA[i] == numberB[i]) { // 1.
             continue;
-        } else if (numberA[i] == '-' && numberB[i] > '0') {
+        } else if ((numberA[i] == '-' && numberB[i] == '0') || (numberB[i] == '-' && numberA[i] == '0') ) { // 2.
+            continue;
+        } else if (numberA[i] == '-' && numberB[i] > '0') { // 3.
             return false;
-        } else if (numberB[i] == '-' && numberA[i] > '0') {
+        } else if (numberB[i] == '-' && numberA[i] > '0') { // 4.
             return true;
-        } else if (numberA[i] < numberB[i]) {
+        } else if (numberA[i] < numberB[i]) { // 5.
             return false;
-        } else if (numberA[i] >= '0' && numberB[i] >= '0') {
+        } else { // 6.
             return true;
         }
     }
-    return true;
+
+    return false;
 }
 
+// Adds 2 strings numbers together and returns the result
+//      @numberA: first number
+//      @numberB: second number
 string add_stringA_and_stringB(string numberA, string numberB) {
-    int max_length = max(numberA.length(), numberB.length());
 
+    // Adjusting number so they are equal length
+    int max_length = max(numberA.length(), numberB.length());
     numberA = adjust_number(numberA, max_length);
     numberB = adjust_number(numberB, max_length);
 
+    // Finding out which abs() of the numbers is greater to make calculation easier,
+    // then swapping the numbers so that numberA is greater then numberB
     if (!isGreater(numberA, numberB)) {
         swap(numberA, numberB);
     }
 
-    bool pos = numberA[0] == numberB[0] || (numberA[0] != '-' && numberB[0] != '-');
+    // Determines if both numbers are either positive or negative
+    bool sameSign = numberA[0] == numberB[0] || (numberA[0] != '-' && numberB[0] != '-');
 
     int carry = 0;
     for (int i = max_length; i > 0; i--) {
         int sum = 0;
-        if (pos) { // Case when both numbers are either positive or negative
+        if (sameSign) {
             if (numberA[i-1] == '-' || numberB[i-1] == '-') {
                 if (carry != 0) {
                     numberA[0] = to_string(carry).back();
@@ -101,6 +126,6 @@ string add_stringA_and_stringB(string numberA, string numberB) {
         }
     }
 
-
+    // Return result
     return numberA;
 }
