@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <cmath>
 
 #include "functions.cpp"
 
@@ -136,5 +137,21 @@ TEST(add_stringA_and_stringB, AddingNegativeAndPositiveNumber) {
 
         evaulate_result(numberA, numberB);
         evaulate_result(numberB, numberA);
+    }
+}
+
+TEST(add_stringA_and_stringB, Adding10RandomNumbersUpTo10Digits) {
+    srand(time(0));
+    for (int i = 0; i < 10; i++) {
+        string result = "0";
+        long long expected_result = 0;
+
+        for (int y = 0; y < 10; y++) {
+            long number = long(-pow(10, y+1) + 1) + rand() % (2 * long(pow(10, y+1)) - 1);
+            expected_result += number;
+            result = add_stringA_and_stringB(result, to_string(number));
+        }
+
+        EXPECT_EQ(result, to_string(expected_result));
     }
 }
