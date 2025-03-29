@@ -30,12 +30,12 @@ string generate_number(int digits) {
 //     @length: number what the string needs to be adjusted to
 string adjust_number(string number, int length) {
 
-    if (length < number.length()) {
+    if (length < int(number.length())) {
         throw invalid_argument("Length must be greater or equal to @number length.");
     }
 
     // Loop until string is the right length
-    while(number.length() < length) {
+    while(int(number.length()) < length) {
         // If the "number" is negative we need to keep '-' at the start and add a '0'
         // otherwise add a '0' at the start
         if (number[0] == '-') {
@@ -55,7 +55,7 @@ string adjust_number(string number, int length) {
 //     @numberB: string thats expected to be lower
 bool isGreater(string numberA, string numberB) {
 
-    for (int i = 0; i < numberA.length(); i++) {
+    for (int i = 0; i < int(numberA.length()); i++) {
         // 1. If the numbers are equal we move on to the next index
         // 2. If one of the numbers is negative and the other starts with a '0', move on to the next index
         // 3. If the first number is negative and the second one is greater then '0' we know that second 
@@ -86,8 +86,9 @@ bool isGreater(string numberA, string numberB) {
 //      @numberB: second number
 string add_stringA_and_stringB(string numberA, string numberB) {
 
-    // Adjusting number so they are equal length
-    int max_length = max(numberA.length(), numberB.length());
+    // Adjusting number so they are equal length,
+    // setting max_length to avoid 
+    int max_length = max(numberA.length(), numberB.length()) + 1;
     numberA = adjust_number(numberA, max_length);
     numberB = adjust_number(numberB, max_length);
 
@@ -97,35 +98,38 @@ string add_stringA_and_stringB(string numberA, string numberB) {
         swap(numberA, numberB);
     }
 
+    string result = "";
+
     // Determines if both numbers are either positive or negative
     bool sameSign = numberA[0] == numberB[0] || (numberA[0] != '-' && numberB[0] != '-');
 
     int carry = 0;
     for (int i = max_length; i > 0; i--) {
         int sum = 0;
+        if (numberA[i-1] == '-' || numberB[i-1] == '-') {
+            break;
+        }
         if (sameSign) {
-            if (numberA[i-1] == '-' || numberB[i-1] == '-') {
-                if (carry != 0) {
-                    numberA[0] = to_string(carry).back();
-                }
-                numberA[0] = '-';
-                break;
-            }
             sum = numberA[i-1] + numberB[i-1] - (2 * 48) + carry;
-            numberA[i-1] = to_string(sum).back();
+            result = to_string(sum).back() + result;
             carry = sum / 10;
         } else {
-            if (numberA[i-1] == '-' || numberB[i-1] == '-') {
-                numberA[i-1] = (numberA[i-1] == '-' && numberB[i-1] != '0' ? numberB[i-1] : numberA[i-1]);
-                break;
-            }
             carry = (numberA[i-1] < numberB[i-1] ? 1 : 0); 
             sum = numberA[i-1] - numberB[i-1] + (carry * 10);
-            numberA[i-1] = to_string(sum).back();
+            result = to_string(sum).back() + result;
             numberA[i-2] = (carry == 1 ? numberA[i-2] - 1 : numberA[i-2]);
         }
     }
 
-    // Return result
-    return numberA;
+    if (numberA[0] == '-') {
+        result = '-' + result;
+    }
+
+    // Truncate leading zeros
+    int start = (result[0] == '-') ? 1 : 0;
+    while (start < result.length() - 1 && result[start] == '0') {
+        start++;
+    }
+
+    return (result[0] == '-') ? "-" + result.substr(start) : result.substr(start);
 }

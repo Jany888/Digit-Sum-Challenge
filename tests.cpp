@@ -3,9 +3,9 @@
 #include "functions.cpp"
 
 /* Test expected to throw exception */
-TEST(GenerateNumber, CheckArguments) {
+TEST(generate_number, CheckArguments) {
     srand(time(0));
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 100; i++) {
         int digits = -50 + rand() % 101;
         try {
             generate_number(digits);
@@ -13,29 +13,29 @@ TEST(GenerateNumber, CheckArguments) {
                 FAIL() << "Expected invalid_argument exception.";
             }
         } catch(invalid_argument const & e) {
-            EXPECT_EQ(e.what(),std::string("Argument must be greater then 0."));
+            EXPECT_EQ(e.what(),string("Argument must be greater then 0."));
         } catch(...) {
             FAIL() << "Expected invalid_argument exception.";
         }
     }
 }
 
-/* Test expected to pass */
-TEST(GenerateNumber, CheckLength) {
-    for (int i = 0; i < 10; i++) {
+TEST(generate_number, CheckLength) {
+    srand(time(0));
+    for (int i = 0; i < 100; i++) {
         int digits = 1 + rand() % 100; // Generates number from 1-100
-        std::string number = generate_number(digits);
+        string number = generate_number(digits);
         int length = (number[0] == '-' ? number.length() - 1 : number.length());
 
         EXPECT_EQ(length, digits);
     }
 }
 
-/* Test expected to pass */
-TEST(GenerateNumber, CheckCorrectCharacters) {
+TEST(generate_number, CheckCorrectCharacters) {
+    srand(time(0));
     for (int i = 0; i < 10; i++) {
         int digits = 1 + rand() % 100; // Generates number from 1-100
-        std::string number = generate_number(digits);
+        string number = generate_number(digits);
 
         for (int y = 0; y < number.length(); y++) {
             if (number[y] != '-' && !(number[y] >= '0' && number[y] <= '9')) {
@@ -45,62 +45,96 @@ TEST(GenerateNumber, CheckCorrectCharacters) {
     }
 }
 
-/* Test expected to pass */
-TEST(AdjustNumber, CheckAdjustedNumber) {
-    for (int i = 0; i < 10; i++) {
+TEST(adjust_number, CheckAdjustedNumber) {
+    srand(time(0));
+    for (int i = 0; i < 100; i++) {
         int digits = -9999 + rand() % 20000; // Generates number from -9999 to 9999
-        std::string number = std::to_string(digits);
+        string number = to_string(digits);
 
         int adjust_length = number.length() + rand() % 5;
-        std::string adjusted_number = adjust_number(number, adjust_length);
+        string adjusted_number = adjust_number(number, adjust_length);
 
         EXPECT_EQ(adjust_length, adjusted_number.length());
 
         int number_of_zeros = 0;
         number_of_zeros += adjust_length - number.length();
         if (number[0] == '-') {
-            EXPECT_EQ(std::string(number_of_zeros, '0'), adjusted_number.substr(1, number_of_zeros));
+            EXPECT_EQ(string(number_of_zeros, '0'), adjusted_number.substr(1, number_of_zeros));
         } else {
-            EXPECT_EQ(std::string(number_of_zeros, '0'), adjusted_number.substr(0, number_of_zeros));
+            EXPECT_EQ(string(number_of_zeros, '0'), adjusted_number.substr(0, number_of_zeros));
         }
     }
 
     for (int i = 0; i < 5; i++) {
         int digits = -9999 + rand() % 20000; // Generates number from -9999 to 9999
-        std::string number = std::to_string(digits);
+        string number = to_string(digits);
 
         try {
             adjust_number(number, number.length() - (1 + rand() % 5));
             FAIL() << "Length must be greater or equal to @number length.";
         } catch(invalid_argument const & e) {
-            EXPECT_EQ(e.what(),std::string("Length must be greater or equal to @number length."));
+            EXPECT_EQ(e.what(),string("Length must be greater or equal to @number length."));
         } catch(...) {
             FAIL() << "Length must be greater or equal to @number length.";
         }
     }
 }
 
-TEST(AddNumbers, AddingPositives) {
-    EXPECT_EQ(add_stringA_and_stringB("120", "1"), "121");
-    EXPECT_EQ(add_stringA_and_stringB("1", "2"), "3");
-    EXPECT_EQ(add_stringA_and_stringB("5398", "690"), "6088");
-    EXPECT_EQ(add_stringA_and_stringB("17169301", "864921657"), "882090958");
+TEST(isGreater, BasicValidity) {
+    srand(time(0));
+    for (int i = 0; i < 100; i++) {
+        int numberA = -9999 + rand() % 20000;
+        int numberB = -9999 + rand() % 20000;
+
+        string numberA_string = to_string(numberA);
+        string numberB_string = to_string(numberB);
+
+        int max_length = max(numberA_string.length(), numberB_string.length());
+
+        numberA_string = adjust_number(numberA_string, max_length);
+        numberB_string = adjust_number(numberB_string, max_length);
+
+        EXPECT_EQ(isGreater(numberA_string, numberB_string), (abs(numberA) > abs(numberB)));
+    }
 }
 
-TEST(AddNumbers, AddingNegatives) {
-    EXPECT_EQ(add_stringA_and_stringB("-120", "-1"), "-121");
-    EXPECT_EQ(add_stringA_and_stringB("-1", "-2"), "-3");
-    EXPECT_EQ(add_stringA_and_stringB("-5398", "-690"), "-6088");
-    EXPECT_EQ(add_stringA_and_stringB("-17169301", "-864921657"), "-882090958");
+void evaulate_result(int numberA, int numberB) {
+    string numberA_string = to_string(numberA);
+    string numberB_string = to_string(numberB);
+
+    string result = add_stringA_and_stringB(numberA_string, numberB_string);
+    string expected_result = to_string(numberA + numberB);
+
+    EXPECT_EQ(result, expected_result);
 }
 
-TEST(AddNumbers, AddingNegativeAndPositive) {
-    EXPECT_EQ(add_stringA_and_stringB("-120", "1"), "-119");
-    EXPECT_EQ(add_stringA_and_stringB("1", "-120"), "-119");
-    EXPECT_EQ(add_stringA_and_stringB("1", "-2"), "-1");
-    EXPECT_EQ(add_stringA_and_stringB("-2", "1"), "-1");
-    EXPECT_EQ(add_stringA_and_stringB("5398", "-690"), "4708");
-    EXPECT_EQ(add_stringA_and_stringB("-690", "5398"), "4708");
-    EXPECT_EQ(add_stringA_and_stringB("17169301", "-864921657"), "-847752356");
-    EXPECT_EQ(add_stringA_and_stringB("-864921657", "17169301"), "-847752356");
+TEST(add_stringA_and_stringB, AddingPositives) {
+    srand(time(0));
+    for (int i = 0; i < 100; i++) {
+        int numberA = rand() % 999999;
+        int numberB = rand() % 999999;
+
+        evaulate_result(numberA, numberB);
+    }
+}
+
+TEST(add_stringA_and_stringB, AddingNegatives) {
+    srand(time(0));
+    for (int i = 0; i < 100; i++) {
+        int numberA = (1 + rand() % 999999) * -1; // -999,999 - -1
+        int numberB = (1 + rand() % 999999) * -1;
+
+        evaulate_result(numberA, numberB);
+    }
+}
+
+TEST(add_stringA_and_stringB, AddingNegativeAndPositiveNumber) {
+    srand(time(0));
+    for (int i = 0; i < 100; i++) {
+        int numberA = rand() % 999999;
+        int numberB = (1 + rand() % 999999) * -1;
+
+        evaulate_result(numberA, numberB);
+        evaulate_result(numberB, numberA);
+    }
 }
