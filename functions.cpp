@@ -4,7 +4,6 @@
 
 using namespace std;
 
-
 // Function generates a random positive or negative number
 //     @digits: number of digits to generate, should be >=1
 string generate_number(int digits) {
@@ -106,14 +105,19 @@ string add_stringA_and_stringB(string numberA, string numberB) {
     int carry = 0;
     for (int i = max_length; i > 0; i--) {
         int sum = 0;
+
+        // If one of the numbers current position is '-' there is no addition left, so break
         if (numberA[i-1] == '-' || numberB[i-1] == '-') {
             break;
         }
-        if (sameSign) {
+
+        // 1. If both numbers have the same sign we can add them together, adding '-' later if necessary
+        // 2. otherwise we need to use different logic to add numbers together
+        if (sameSign) { // 1.
             sum = numberA[i-1] + numberB[i-1] - (2 * 48) + carry;
             result = to_string(sum).back() + result;
             carry = sum / 10;
-        } else {
+        } else { // 2.
             carry = (numberA[i-1] < numberB[i-1] ? 1 : 0); 
             sum = numberA[i-1] - numberB[i-1] + (carry * 10);
             result = to_string(sum).back() + result;
@@ -121,6 +125,7 @@ string add_stringA_and_stringB(string numberA, string numberB) {
         }
     }
 
+    // After calculations are done, we need to add '-', we can do this because we made sure that numberA is greater
     if (numberA[0] == '-') {
         result = '-' + result;
     }
@@ -144,15 +149,17 @@ void run(int number_quantity) {
             throw invalid_argument("run(@number_quantity) must be greater then 0.");
         }
 
-        std::string result = "0";
+        string result = "0";
 
+        // Loop to generate numbers, adding them to the result and printing them to console
         for (int i = 0; i < number_quantity; i++) {
-            std::string number = generate_number(i+1);
-            std::cout << i+1 << ": " << number << std::endl;
+            string number = generate_number(i+1);
+            cout << i+1 << ": " << number << std::endl;
             result = add_stringA_and_stringB(result, number);
         }
 
-        std::cout << std::endl << "First 10 digits are: " << (result[0] == '-' ? result.substr(0,11) : result.substr(0,10)) << std::endl;
+        // Printing first 10 digits, if the result is negative we need to print +1 characters
+        cout << endl << "First 10 digits are: " << (result[0] == '-' ? result.substr(0,11) : result.substr(0,10)) << endl;
     } catch (exception& e) {
         cerr << e.what() << endl;
         exit(-1);
