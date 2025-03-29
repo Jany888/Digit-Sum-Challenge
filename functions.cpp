@@ -133,3 +133,28 @@ string add_stringA_and_stringB(string numberA, string numberB) {
 
     return (result[0] == '-') ? "-" + result.substr(start) : result.substr(start);
 }
+
+// Function takes a number of numbers to generate, numbers can be negative or positive,
+// each nth number has n digits
+//      @number_quantity: how many numbers to generate
+void run(int number_quantity) {
+    try {
+
+        if (number_quantity < 1) {
+            throw invalid_argument("run(@number_quantity) must be greater then 0.");
+        }
+
+        std::string result = "0";
+
+        for (int i = 0; i < number_quantity; i++) {
+            std::string number = generate_number(i+1);
+            std::cout << i+1 << ": " << number << std::endl;
+            result = add_stringA_and_stringB(result, number);
+        }
+
+        std::cout << std::endl << "First 10 digits are: " << (result[0] == '-' ? result.substr(0,11) : result.substr(0,10)) << std::endl;
+    } catch (exception& e) {
+        cerr << e.what() << endl;
+        exit(-1);
+    }
+}
